@@ -1,7 +1,7 @@
 package com.zjj.fishPlugin.ui;
 
 import com.intellij.openapi.ui.ComboBox;
-import com.zjj.fishPlugin.config.Config;
+import com.zjj.fishPlugin.service.NovelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +22,14 @@ public class SettingUI {
     private ComboBox comboBox;
     private JLabel number;
     private JTextField timeField;
+    private final NovelService novelService;
 
-    public SettingUI() {
+    public SettingUI(NovelService novelService) {
+        this.novelService = novelService;
         comboBox.setModel(new DefaultComboBoxModel<>(items));
-        comboBox.setSelectedItem(Config.LineNumber != null ? Config.LineNumber : "50 字"); // 默认选中
-        textField.setText(Config.novelPath);
-        timeField.setText(Config.autoPageTime);
+        comboBox.setSelectedItem(novelService.getLineNumber() != null ? novelService.getLineNumber() : "50 字"); // 默认选中
+        textField.setText(novelService.getNovelPath());
+        timeField.setText(novelService.getAutoPageTime());
         urlButton.addActionListener(e -> {
             JFileChooser jFileChooser = new JFileChooser();
             jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

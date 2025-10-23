@@ -1,6 +1,6 @@
 package com.zjj.fishPlugin.ui;
 
-import com.zjj.fishPlugin.config.Config;
+import com.zjj.fishPlugin.service.NovelService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,8 +20,10 @@ public class ReadUI {
 
     private int currentChapterPage = 0; // 当前章节页码
     private static final int CHAPTERS_PER_PAGE = 30; // 每页显示多少个章节
+    private final NovelService novelService;
 
-    public ReadUI() {
+    public ReadUI(NovelService novelService) {
+        this.novelService = novelService;
         preButton.addActionListener(e -> prevChapterPage());
         nextButton.addActionListener(e -> nextChapterPage());
         // 添加页码跳转监听
@@ -43,12 +45,9 @@ public class ReadUI {
         return mainPanel;
     }
 
-    // 保证单例
-    public static ReadUI getReadUI() {
-        if (Config.readUI == null) {
-            Config.readUI = new ReadUI();
-        }
-        return Config.readUI;
+    // 获取ReadUI实例
+    public static ReadUI getReadUI(NovelService novelService) {
+        return novelService.getReadUI();
     }
 
     public JList getBookList() {
@@ -59,24 +58,37 @@ public class ReadUI {
      * 加载章节列表
      */
     public void loadChapterPage() {
-        if (Config.chapters == null || Config.chapters.isEmpty()) {
+        if (novelService.getChapters() == null || novelService.getChapters().isEmpty()) {
             bookList.setListData(new String[]{"请先去设置里选择小说"});
             return;
         }
 
-        int totalChapters = Config.chapters.size();
+        // 根据当前阅读的章节计算应该显示哪一页章节列表
+        updateCurrentChapterPage();
+
+        int totalChapters = novelService.getChapters().size();
         int fromIndex = currentChapterPage * CHAPTERS_PER_PAGE;
         int toIndex = Math.min(fromIndex + CHAPTERS_PER_PAGE, totalChapters);
 
-        List<String> subList = Config.chapters.subList(fromIndex, toIndex);
+        List<String> subList = novelService.getChapters().subList(fromIndex, toIndex);
         bookList.setListData(subList.toArray(new String[0]));
+    }
+
+    /**
+     * 根据当前阅读的章节更新章节列表页码
+     */
+    private void updateCurrentChapterPage() {
+        if (novelService.getChapters() != null && !novelService.getChapters().isEmpty()) {
+            int currentChapterIndex = novelService.getCurrentChapterIndex();
+            currentChapterPage = currentChapterIndex / CHAPTERS_PER_PAGE;
+        }
     }
 
     /**
      * 下一页
      */
     public void nextChapterPage() {
-        int totalPages = (int) Math.ceil(Config.chapters.size() / (double) CHAPTERS_PER_PAGE);
+        int totalPages = (int) Math.ceil(novelService.getChapters().size() / (double) CHAPTERS_PER_PAGE);
         if (currentChapterPage < totalPages - 1) {
             currentChapterPage++;
             loadChapterPage();
@@ -109,7 +121,7 @@ public class ReadUI {
 
         try {
             int pageNum = Integer.parseInt(text);
-            int totalPages = (int) Math.ceil(Config.chapters.size() / (double) CHAPTERS_PER_PAGE);
+            int totalPages = (int) Math.ceil(novelService.getChapters().size() / (double) CHAPTERS_PER_PAGE);
 
             if (pageNum < 1 || pageNum > totalPages) {
                 JOptionPane.showMessageDialog(mainPanel, "页码超出范围，1 - " + totalPages);
@@ -131,13 +143,13 @@ public class ReadUI {
      */
     public void handleMouseDoubleClick(Point point){
         int index = bookList.locationToIndex(point);
-        if (index >= 0 && index < Config.chapters.size()) {
+        if (index >= 0 && index < novelService.getChapters().size()) {
             // 更新当前章节索引
-            Config.currentChapterIndex = this.currentChapterPage* CHAPTERS_PER_PAGE + index;
+            novelService.setCurrentChapterIndex(this.currentChapterPage * CHAPTERS_PER_PAGE + index);
             //从章节开头开始
-            Config.currentPageIndex = 0;
+            novelService.setCurrentPageIndex(0);
             //展示小说
-            Config.displayNovel();
+            novelService.displayNovel();
         }
     }
 }

@@ -3,9 +3,11 @@ package com.zjj.fishPlugin.factory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.util.NlsContexts;
-import com.zjj.fishPlugin.config.Config;
+import com.zjj.fishPlugin.service.NovelService;
 import com.zjj.fishPlugin.ui.ReadUI;
 import com.zjj.fishPlugin.ui.SettingUI;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +26,19 @@ import java.util.regex.Pattern;
  * Created by zhongjiajie on 2025/10/9 10:20.
  */
 public class SettingFactory implements SearchableConfigurable {
-    private SettingUI settingUI = new SettingUI();
+    private SettingUI settingUI;
+    
+    private NovelService getNovelService() {
+        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+        return NovelService.getInstance(project);
+    }
+    
+    private SettingUI getSettingUI() {
+        if (settingUI == null) {
+            settingUI = new SettingUI(getNovelService());
+        }
+        return settingUI;
+    }
 
     @Override
     public @NotNull @NonNls String getId() {
@@ -38,18 +52,20 @@ public class SettingFactory implements SearchableConfigurable {
 
     @Override
     public @Nullable JComponent createComponent() {
-        return settingUI.getComponent();
+        return getSettingUI().getComponent();
     }
 
     @Override
     public boolean isModified() {
-        if(!Objects.equals(Config.novelPath, settingUI.getTextField().getText())){
+        NovelService novelService = getNovelService();
+        SettingUI ui = getSettingUI();
+        if(!Objects.equals(novelService.getNovelPath(), ui.getTextField().getText())){
             return true;
         }
-        if(!Objects.equals(Config.LineNumber, settingUI.getSelectedCharsPerLine())){
+        if(!Objects.equals(novelService.getLineNumber(), ui.getSelectedCharsPerLine())){
             return true;
         }
-        if(!Objects.equals(Config.autoPageTime, settingUI.getTimeField().getText().trim())){
+        if(!Objects.equals(novelService.getAutoPageTime(), ui.getTimeField().getText().trim())){
             return true;
         }
         return false;
@@ -57,13 +73,38 @@ public class SettingFactory implements SearchableConfigurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        String url = settingUI.getTextField().getText();
-        Config.LineNumber = settingUI.getSelectedCharsPerLine();
-        Config.novelPath = url;
-        Config.autoPageTime = settingUI.getTimeField().getText().trim();
-        this.loadNovelWithPagination(url);
-        ReadUI readUI = ReadUI.getReadUI();
+        NovelService novelService = getNovelService();
+        SettingUI ui = getSettingUI();
+        String url = ui.getTextField().getText();
+        novelService.setLineNumber(ui.getSelectedCharsPerLine());
+        novelService.setAutoPageTime(ui.getTimeField().getText().trim());
+        if(!Objects.equals(novelService.getNovelPath(), ui.getTextField().getText())){
+            novelService.setNovelPath(url);
+            this.loadNovelWithPagination(novelService, url);
+        }
+        ReadUI readUI = novelService.getReadUI();
         readUI.loadChapterPage();
+    }
+
+    // 自动加载上次的小说
+    public void autoLoadLastNovel() {
+        NovelService novelService = getNovelService();
+        if (novelService.getNovelPath() != null && !novelService.getNovelPath().isEmpty()) {
+            try {
+                // 使用isAutoLoad=true来保持阅读进度
+                this.loadNovelWithPagination(novelService, novelService.getNovelPath(), true);
+                // 恢复阅读进度
+                novelService.displayNovel();
+                // 更新ReadUI的章节列表
+                ReadUI readUI = novelService.getReadUI();
+                readUI.loadChapterPage();
+            } catch (Exception e) {
+                // 如果加载失败，清空状态
+                novelService.setNovelPath("");
+                novelService.setCurrentChapterIndex(0);
+                novelService.setCurrentPageIndex(0);
+            }
+        }
     }
 
     private String preprocessText(String text) {
@@ -142,11 +183,15 @@ public class SettingFactory implements SearchableConfigurable {
         return result;
     }
 
-    public void loadNovelWithPagination(String filePath) {
+    public void loadNovelWithPagination(NovelService novelService, String filePath) {
+        loadNovelWithPagination(novelService, filePath, false);
+    }
+    
+    public void loadNovelWithPagination(NovelService novelService, String filePath, boolean isAutoLoad) {
         try {
             File file = new File(filePath);
             String charset = detectCharset(file);
-            int charsPerPage = Integer.parseInt(Config.LineNumber.substring(0, 2));
+            int charsPerPage = Integer.parseInt(novelService.getLineNumber().substring(0, 2));
 
             List<String> chapters = new ArrayList<>();
             List<List<String>> chapterPages = new ArrayList<>();
@@ -198,15 +243,19 @@ public class SettingFactory implements SearchableConfigurable {
                 chapterPages.add(paginate(currentChapter.toString(), charsPerPage, currentTitle));
             }
 
-            // 保存到全局
-            Config.chapters = chapters;
-            Config.chapterPages = chapterPages;
-            Config.currentChapterIndex = 0;
-            Config.currentPageIndex = 0;
+            // 保存到NovelService
+            novelService.setChapters(chapters);
+            novelService.setChapterPages(chapterPages);
+            
+            // 只有在手动选择新小说时才重置进度，自动加载时保持原进度
+            if (!isAutoLoad) {
+                novelService.setCurrentChapterIndex(0);
+                novelService.setCurrentPageIndex(0);
+            }
 
-            // 显示第一章第一页
+            // 显示当前页面
             if (!chapterPages.isEmpty() && !chapterPages.get(0).isEmpty()) {
-                Config.displayNovel();
+                novelService.displayNovel();
             }
         } catch (Exception e) {
             e.printStackTrace();

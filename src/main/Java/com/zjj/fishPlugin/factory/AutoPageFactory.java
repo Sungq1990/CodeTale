@@ -8,7 +8,7 @@ import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 import com.intellij.ui.AnimatedIcon;
 import com.intellij.util.Consumer;
-import com.zjj.fishPlugin.config.Config;
+import com.zjj.fishPlugin.service.NovelService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -125,7 +125,8 @@ public class AutoPageFactory implements StatusBarWidgetFactory {
          */
         private void startAutoPage() {
             try {
-                String time = Config.autoPageTime;
+                NovelService novelService = NovelService.getInstance(project);
+                String time = novelService.getAutoPageTime();
                 if(StrUtil.isBlank(time)){
                     JOptionPane.showMessageDialog(null, "请先去设置里输入自动翻页时间");
                     return;
@@ -140,7 +141,7 @@ public class AutoPageFactory implements StatusBarWidgetFactory {
                     autoPageTimer.stop();
                 }
 
-                autoPageTimer = new Timer(seconds, e -> Config.nextPage());
+                autoPageTimer = new Timer(seconds, e -> novelService.nextPage());
                 autoPageTimer.start();
 
                 isAutoPaging = true;

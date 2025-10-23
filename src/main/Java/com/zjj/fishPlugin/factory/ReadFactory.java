@@ -5,7 +5,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.zjj.fishPlugin.config.Config;
+import com.zjj.fishPlugin.service.NovelService;
 import com.zjj.fishPlugin.ui.ReadUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,12 +14,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ReadFactory implements ToolWindowFactory {
 
-    private ReadUI readUI = ReadUI.getReadUI();
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        NovelService novelService = NovelService.getInstance(project);
+        ReadUI readUI = novelService.getReadUI();
         Content content = ContentFactory.getInstance().createContent(readUI.getComponent(), "Book", false);
         toolWindow.getContentManager().addContent(content);
-        Config.readUI = readUI;
     }
 
 }

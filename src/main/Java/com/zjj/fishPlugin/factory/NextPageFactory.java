@@ -6,7 +6,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 import com.intellij.util.Consumer;
-import com.zjj.fishPlugin.config.Config;
+import com.zjj.fishPlugin.service.NovelService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +92,8 @@ public class NextPageFactory implements StatusBarWidgetFactory {
         }
 
         private void showNextLine() {
-            Config.nextPage();
+            NovelService novelService = NovelService.getInstance(project);
+            novelService.nextPage();
         }
     }
 }

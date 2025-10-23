@@ -17,6 +17,10 @@ repositories {
 dependencies {
     implementation("com.googlecode.juniversalchardet:juniversalchardet:1.0.3")
     implementation("cn.hutool:hutool-all:5.8.40")
+    compileOnly("org.projectlombok:lombok:1.18.34")
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
+    testCompileOnly("org.projectlombok:lombok:1.18.34")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
     intellijPlatform {
         create("IC", "2025.1")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
