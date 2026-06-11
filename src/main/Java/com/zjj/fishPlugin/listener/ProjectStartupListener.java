@@ -17,7 +17,7 @@ public class ProjectStartupListener implements StartupActivity {
         // 延迟执行，确保项目完全加载
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
-                SettingFactory settingFactory = new SettingFactory();
+                SettingFactory settingFactory = new SettingFactory(project);
                 settingFactory.autoLoadLastNovel();
             } catch (Exception e) {
                 // 静默处理错误，避免影响项目启动

@@ -58,13 +58,23 @@ public class ReadUI {
      * 加载章节列表
      */
     public void loadChapterPage() {
+        loadChapterPage(false);
+    }
+
+    /**
+     * 加载章节列表
+     * @param autoPosition 是否自动定位到当前阅读章节
+     */
+    public void loadChapterPage(boolean autoPosition) {
         if (novelService.getChapters() == null || novelService.getChapters().isEmpty()) {
             bookList.setListData(new String[]{"请先去设置里选择小说"});
             return;
         }
 
-        // 根据当前阅读的章节计算应该显示哪一页章节列表
-        updateCurrentChapterPage();
+        // 只有在自动定位时才根据当前阅读的章节计算应该显示哪一页章节列表
+        if (autoPosition) {
+            updateCurrentChapterPage();
+        }
 
         int totalChapters = novelService.getChapters().size();
         int fromIndex = currentChapterPage * CHAPTERS_PER_PAGE;

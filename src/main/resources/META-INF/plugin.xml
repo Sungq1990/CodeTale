@@ -1,34 +1,49 @@
 <idea-plugin>
     <id>com.zjj.fishPlugin</id>
     <name>YsQy-Book</name>
-    <version>1.0.1</version>
+    <version>1.1.1</version>
     <vendor email="youshangzhuqingyuzhong@gmail.com">YsQy</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <![CDATA[
     <b>YsQy-Book</b> — A lightweight novel reading plugin for IntelliJ IDEA.<br>
-    Supports chapter-based reading, page jumping, and <b>auto page turning</b>.<br>
-    Enjoy your favorite books directly within your IDE.<br><br>
+    Supports chapter-based reading, page jumping, <b>auto page turning</b>, and <b>reading progress persistence</b>.<br>
+    Enjoy your favorite books directly within your IDE with seamless reading experience.<br><br>
     ]]>
     <description>
         <![CDATA[
     <b>YsQy-Book</b> — A lightweight novel reading plugin for IntelliJ IDEA.<br>
-    Supports chapter-based reading, page jumping, and <b>auto page turning</b>.<br>
-    Enjoy your favorite books directly within your IDE.<br><br>
+    Supports chapter-based reading, page jumping, <b>auto page turning</b>, and <b>reading progress persistence</b>.<br>
+    Enjoy your favorite books directly within your IDE with seamless reading experience.<br><br>
+
+    <b>🆕 Version 1.1.1 - Major Update:</b><br>
+    ✨ <b>Reading Progress Persistence</b>: Automatically saves and restores your reading progress<br>
+    🔄 <b>Multi-Project Support</b>: Each project maintains independent reading state<br>
+    🚀 <b>Auto-Load on Startup</b>: Automatically loads your last novel when opening IDEA<br>
+    📖 <b>Smart Chapter Navigation</b>: Chapter list automatically positions to current reading location<br>
+    ⚡ <b>Real-time Progress Saving</b>: Progress is saved automatically with every page turn<br><br>
 
     Usage:<br>
     1. <b>IDEA Settings > Tools > YsQy Book</b>: Set the novel path and auto page turn interval.<br>
     2. <b>Bottom-left corner of IDEA</b>: Read novels directly in the status bar.<br>
     3. <b>YsQy-Book sidebar</b>: Navigate chapters and menus.<br>
-    4. If the navigation bar is shown in the bottom left corner instead, you need to click IDEA's top menu bar: <b>View > Appearance > Navigation Bar > Top</b> to move the navigation bar to the top. Then double-click the chapter again to display the content.<br><br>
+    4. <b>Seamless Experience</b>: Your reading progress is automatically saved and restored!<br><br>
 
-    <b>YsQy-Book</b> — 一款轻量级 IntelliJ IDEA 小说阅读插件，支持章节阅读、页码跳转与自动翻页功能，让你在编码间隙轻松阅读。<br>
+    <b>YsQy-Book</b> — 一款轻量级 IntelliJ IDEA 小说阅读插件，支持章节阅读、页码跳转、自动翻页与阅读进度持久化功能，让你在编码间隙轻松阅读。<br><br>
+    
+    <b>🆕 版本 1.1.1 - 重大更新：</b><br>
+    ✨ <b>阅读进度持久化</b>：自动保存和恢复阅读进度<br>
+    🔄 <b>多项目支持</b>：每个项目独立维护阅读状态<br>
+    🚀 <b>启动自动加载</b>：打开IDEA时自动加载上次的小说<br>
+    📖 <b>智能章节导航</b>：章节列表自动定位到当前阅读位置<br>
+    ⚡ <b>实时进度保存</b>：每次翻页自动保存进度<br><br>
+    
     使用说明：<br>
     1. <b>IDEA 设置 > 工具 > YsQy Book</b>：设置小说路径和自动翻页秒数。<br>
     2. <b>IDEA 左下角</b>：直接在状态栏阅读小说。<br>
     3. <b>YsQy-Book 侧边栏</b>：浏览章节和菜单。<br>
-    4. 如果左下角展示的是导航栏，需要依次点击 IDEA 顶部菜单栏的 <b>View > Appearance > Navigation Bar > Top</b>，将导航栏移到顶部，再次双击章节即可展示。
+    4. <b>无缝体验</b>：阅读进度自动保存和恢复！
     ]]>
     </description>
 

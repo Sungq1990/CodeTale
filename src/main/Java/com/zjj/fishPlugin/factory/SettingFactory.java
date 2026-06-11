@@ -27,15 +27,41 @@ import java.util.regex.Pattern;
  */
 public class SettingFactory implements SearchableConfigurable {
     private SettingUI settingUI;
+    private Project lastProject;
+    private NovelService cachedNovelService;
+    
+        // 默认构造函数，供plugin.xml使用
+    public SettingFactory() {
+        // 空构造函数
+    }
+    
+    // 带项目参数的构造函数，供其他地方使用
+    public SettingFactory(Project project) {
+        // 这个构造函数暂时保留，但plugin.xml不会使用它
+    }
     
     private NovelService getNovelService() {
-        Project project = ProjectManager.getInstance().getOpenProjects()[0];
-        return NovelService.getInstance(project);
+        // 使用缓存的服务，避免重复的项目检测
+        if (cachedNovelService == null) {
+            // 获取当前活动的项目
+            Project project = com.intellij.openapi.wm.IdeFocusManager.getGlobalInstance().getLastFocusedFrame().getProject();
+            if (project == null) {
+                // 如果没有活动项目，使用第一个打开的项目
+                project = ProjectManager.getInstance().getOpenProjects()[0];
+            }
+            cachedNovelService = NovelService.getInstance(project);
+        }
+        return cachedNovelService;
     }
     
     private SettingUI getSettingUI() {
-        if (settingUI == null) {
+        // 检查项目是否变化，如果变化则重新创建UI和清除缓存
+        Project currentProject = getNovelService().getProject();
+        if (settingUI == null || !Objects.equals(lastProject, currentProject)) {
             settingUI = new SettingUI(getNovelService());
+            lastProject = currentProject;
+            // 项目变化时清除缓存，下次会重新检测项目
+            cachedNovelService = null;
         }
         return settingUI;
     }
@@ -59,7 +85,8 @@ public class SettingFactory implements SearchableConfigurable {
     public boolean isModified() {
         NovelService novelService = getNovelService();
         SettingUI ui = getSettingUI();
-        if(!Objects.equals(novelService.getNovelPath(), ui.getTextField().getText())){
+        String currentNovelPath = ui.getTextField().getText();
+        if(!Objects.equals(novelService.getNovelPath(), currentNovelPath)){
             return true;
         }
         if(!Objects.equals(novelService.getLineNumber(), ui.getSelectedCharsPerLine())){
@@ -95,9 +122,9 @@ public class SettingFactory implements SearchableConfigurable {
                 this.loadNovelWithPagination(novelService, novelService.getNovelPath(), true);
                 // 恢复阅读进度
                 novelService.displayNovel();
-                // 更新ReadUI的章节列表
+                // 更新ReadUI的章节列表，自动定位到当前阅读章节
                 ReadUI readUI = novelService.getReadUI();
-                readUI.loadChapterPage();
+                readUI.loadChapterPage(true);
             } catch (Exception e) {
                 // 如果加载失败，清空状态
                 novelService.setNovelPath("");
@@ -198,8 +225,25 @@ public class SettingFactory implements SearchableConfigurable {
             StringBuilder currentChapter = new StringBuilder();
             String currentTitle = null;
 
-            Pattern chapterPattern = Pattern.compile("^第.{1,10000}[章回卷篇节].*");
-
+//            Pattern chapterPattern = Pattern.compile("^第.{1,10000}[章回卷篇节].*");
+            Pattern chapterPattern = Pattern.compile(
+                    "^((" +
+                            // 第xx章
+                            "第[0-9一二三四五六七八九十百千万零两〇]+[章回卷篇节].*" +
+                            ")|(" +
+                            // 纯数字开头，允许前导零，后面可跟标点或空格，也可没标点
+                            "0*\\d{1,4}[、.：:]?\\s*[^。]{0,30}$" +
+                            ")|(" +
+                            // 中括号数字，允许前导零
+                            "[【\\[]?0*\\d{1,4}[】\\]]?\\s*[^。]{0,30}$" +
+                            ")|(" +
+                            // 英文章节
+                            "(?i)(chapter|vol|episode)\\s*\\d+.*" +
+                            ")|(" +
+                            // 特殊章节
+                            "(序章|楔子|引子|前言|后记|番外|终章).*" +
+                            "))$"
+            );
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(new FileInputStream(file), Charset.forName(charset)))) {
 
