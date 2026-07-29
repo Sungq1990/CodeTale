@@ -2,12 +2,13 @@ package com.zjj.fishPlugin.factory;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
-import com.intellij.openapi.util.NlsContexts;
-import com.zjj.fishPlugin.service.NovelService;
-import com.zjj.fishPlugin.ui.ReadUI;
-import com.zjj.fishPlugin.ui.SettingUI;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.NlsContexts;
+import com.zjj.fishPlugin.service.NovelService;
+import com.zjj.fishPlugin.service.NovelService.ChapterInfo;
+import com.zjj.fishPlugin.ui.ReadUI;
+import com.zjj.fishPlugin.ui.SettingUI;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +30,7 @@ public class SettingFactory implements SearchableConfigurable {
     private SettingUI settingUI;
     private Project lastProject;
     private NovelService cachedNovelService;
+    private Project configuredProject;
     
         // 默认构造函数，供plugin.xml使用
     public SettingFactory() {
@@ -37,17 +39,20 @@ public class SettingFactory implements SearchableConfigurable {
     
     // 带项目参数的构造函数，供其他地方使用
     public SettingFactory(Project project) {
-        // 这个构造函数暂时保留，但plugin.xml不会使用它
+        this.configuredProject = project;
     }
     
     private NovelService getNovelService() {
         // 使用缓存的服务，避免重复的项目检测
         if (cachedNovelService == null) {
-            // 获取当前活动的项目
-            Project project = com.intellij.openapi.wm.IdeFocusManager.getGlobalInstance().getLastFocusedFrame().getProject();
+            Project project = configuredProject;
             if (project == null) {
-                // 如果没有活动项目，使用第一个打开的项目
-                project = ProjectManager.getInstance().getOpenProjects()[0];
+                // 获取当前活动的项目
+                project = com.intellij.openapi.wm.IdeFocusManager.getGlobalInstance().getLastFocusedFrame().getProject();
+                if (project == null) {
+                    // 如果没有活动项目，使用第一个打开的项目
+                    project = ProjectManager.getInstance().getOpenProjects()[0];
+                }
             }
             cachedNovelService = NovelService.getInstance(project);
         }
@@ -218,12 +223,12 @@ public class SettingFactory implements SearchableConfigurable {
         try {
             File file = new File(filePath);
             String charset = detectCharset(file);
-            int charsPerPage = Integer.parseInt(novelService.getLineNumber().substring(0, 2));
 
             List<String> chapters = new ArrayList<>();
-            List<List<String>> chapterPages = new ArrayList<>();
-            StringBuilder currentChapter = new StringBuilder();
+            List<ChapterInfo> chapterInfos = new ArrayList<>();
             String currentTitle = null;
+            int currentStartLine = 1;
+            int lineNumber = 0;
 
 //            Pattern chapterPattern = Pattern.compile("^第.{1,10000}[章回卷篇节].*");
             Pattern chapterPattern = Pattern.compile(
@@ -249,47 +254,39 @@ public class SettingFactory implements SearchableConfigurable {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (line.isEmpty()) continue;
+                    lineNumber++;
+                    String trimmedLine = line.trim();
+                    if (trimmedLine.isEmpty()) continue;
 
-                    Matcher matcher = chapterPattern.matcher(line);
+                    Matcher matcher = chapterPattern.matcher(trimmedLine);
                     if (matcher.matches()) {
                         // 保存上一章的分页
                         if (currentTitle != null) {
                             chapters.add(currentTitle);
-                            chapterPages.add(paginate(currentChapter.toString(), charsPerPage, currentTitle));
+                            chapterInfos.add(new ChapterInfo(currentTitle, currentStartLine, lineNumber - 1));
                         }
-                        currentTitle = line;
-                        currentChapter.setLength(0);
-                    } else {
-                        currentChapter.append(line).append("\n");
+                        currentTitle = trimmedLine;
+                        currentStartLine = lineNumber + 1;
                     }
                 }
 
                 // 保存最后一章
                 if (currentTitle != null) {
                     chapters.add(currentTitle);
-                    chapterPages.add(paginate(currentChapter.toString(), charsPerPage, currentTitle));
+                    chapterInfos.add(new ChapterInfo(currentTitle, currentStartLine, lineNumber));
                 }
             }
 
             // 如果没匹配章节，把整本书当一章
             if (chapters.isEmpty()) {
-                StringBuilder whole = new StringBuilder();
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(new FileInputStream(file), Charset.forName(charset)))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        whole.append(line).append("\n");
-                    }
-                }
                 chapters.add("全文");
-                chapterPages.add(paginate(currentChapter.toString(), charsPerPage, currentTitle));
+                chapterInfos.add(new ChapterInfo("全文", 1, lineNumber));
             }
 
             // 保存到NovelService
+            novelService.setCharset(charset);
             novelService.setChapters(chapters);
-            novelService.setChapterPages(chapterPages);
+            novelService.setChapterInfos(chapterInfos);
             
             // 只有在手动选择新小说时才重置进度，自动加载时保持原进度
             if (!isAutoLoad) {
@@ -298,46 +295,11 @@ public class SettingFactory implements SearchableConfigurable {
             }
 
             // 显示当前页面
-            if (!chapterPages.isEmpty() && !chapterPages.get(0).isEmpty()) {
+            if (!chapterInfos.isEmpty()) {
                 novelService.displayNovel();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * 将一章内容拆分页
-     */
-    private List<String> paginate(String content, int charsPerPage, @Nullable String chapterTitle) throws IOException {
-        List<String> pages = new ArrayList<>();
-        StringBuilder page = new StringBuilder();
-
-        // 如果有章节标题，则在第一页开头加上标题并换行
-        if (chapterTitle != null && !chapterTitle.isEmpty()) {
-            page.append(chapterTitle).append("---");
-        }
-
-        try (BufferedReader reader = new BufferedReader(new java.io.StringReader(content))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // 去掉段首空格
-                line = line.replaceAll("^[　\\s]+", "");
-                if (line.trim().isEmpty()) continue;
-
-                for (char c : line.toCharArray()) {
-                    page.append(c);
-                    if (page.length() >= charsPerPage) {
-                        pages.add(page.toString());
-                        page.setLength(0);
-                    }
-                }
-                // 换行符算作空格
-                page.append(' ');
-            }
-        }
-
-        if (page.length() > 0) pages.add(page.toString());
-        return pages;
     }
 }
