@@ -94,8 +94,8 @@ public class BossKeyFactory implements StatusBarWidgetFactory {
         public @Nullable @Nls String getTooltipText() {
             NovelService novelService = NovelService.getInstance(project);
             return novelService.isBossHidden()
-                    ? "老板键：小说文本已隐藏（点击显示）"
-                    : "老板键：小说文本已显示（点击隐藏）";
+                    ? "BossKey：文本已隐藏"
+                    : "BossKey：文本已显示";
         }
 
         @Override

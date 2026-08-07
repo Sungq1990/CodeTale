@@ -53,10 +53,8 @@
         <projectConfigurable groupId="tools" key="plugin.settings.displayName" bundle="messages.Bundle" id="ysqy.id" instance="com.zjj.fishPlugin.factory.SettingFactory"/>
 
         <toolWindow id="YsQy-Book" secondary="false" anchor="right" icon="/icon/book.png" factoryClass="com.zjj.fishPlugin.factory.ReadFactory"/>
-        <statusBarWidgetFactory id="novel.status.preWidget" order="before novel.status.nextWidget" implementation="com.zjj.fishPlugin.factory.PrePageFactory"/>
-        <statusBarWidgetFactory id="novel.status.nextWidget" order="before novel.status.autoPageWidget" implementation="com.zjj.fishPlugin.factory.NextPageFactory"/>
-        <statusBarWidgetFactory id="novel.status.autoPageWidget" order="before Encoding" implementation="com.zjj.fishPlugin.factory.AutoPageFactory"/>
-        <statusBarWidgetFactory id="novel.status.bossKeyWidget" order="before Encoding" implementation="com.zjj.fishPlugin.factory.BossKeyFactory"/>
+        <statusBarWidgetFactory id="novel.status.menuWidget" implementation="com.zjj.fishPlugin.factory.NovelMenuFactory"/>
+        <statusBarWidgetFactory id="novel.status.bossKeyWidget" order="after novel.status.menuWidget" implementation="com.zjj.fishPlugin.factory.BossKeyFactory"/>
 
         <postStartupActivity implementation="com.zjj.fishPlugin.listener.ProjectStartupListener"/>
     </extensions>
