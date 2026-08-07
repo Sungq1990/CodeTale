@@ -56,6 +56,7 @@
         <statusBarWidgetFactory id="novel.status.preWidget" order="before novel.status.nextWidget" implementation="com.zjj.fishPlugin.factory.PrePageFactory"/>
         <statusBarWidgetFactory id="novel.status.nextWidget" order="before novel.status.autoPageWidget" implementation="com.zjj.fishPlugin.factory.NextPageFactory"/>
         <statusBarWidgetFactory id="novel.status.autoPageWidget" order="before Encoding" implementation="com.zjj.fishPlugin.factory.AutoPageFactory"/>
+        <statusBarWidgetFactory id="novel.status.bossKeyWidget" order="before Encoding" implementation="com.zjj.fishPlugin.factory.BossKeyFactory"/>
 
         <postStartupActivity implementation="com.zjj.fishPlugin.listener.ProjectStartupListener"/>
     </extensions>
@@ -72,6 +73,12 @@
                 text="YsQyBook: 下一页"
                 description="易阅读 - 下一页">
             <keyboard-shortcut keymap="$default" first-keystroke="alt PAGE_DOWN"/>
+        </action>
+        <action id="YsQyBook.BossKey"
+                class="com.zjj.fishPlugin.action.BossKeyAction"
+                text="YsQyBook: 老板键（隐藏/显示小说）"
+                description="易阅读 - 隐藏/显示当前小说文本">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt B"/>
         </action>
     </actions>
 

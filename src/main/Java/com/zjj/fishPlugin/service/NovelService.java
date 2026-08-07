@@ -9,6 +9,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.zjj.fishPlugin.factory.AutoPageFactory;
+import com.zjj.fishPlugin.factory.BossKeyFactory;
 import com.zjj.fishPlugin.ui.ReadUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,8 @@ public final class NovelService implements PersistentStateComponent<NovelService
     private String charset;                      // 小说文件编码
     private String autoPageTime;                 // 自动翻页时间
 
+    private boolean bossHidden = false;
+
     public NovelService(Project project) {
         this.project = project;
     }
@@ -55,16 +58,46 @@ public final class NovelService implements PersistentStateComponent<NovelService
         return WindowManager.getInstance().getStatusBar(project);
     }
 
-    public void displayNovel() {
-        StatusBar statusBar = getStatusBar();
+    /**
+     * 是否为老板键隐藏状态
+     */
+    public boolean isBossHidden() {
+        return bossHidden;
+    }
+
+    /**
+     * 切换老板键：隐藏/恢复当前小说文本
+     */
+    public void toggleBossHide() {
+        bossHidden = !bossHidden;
         List<String> pages = getCurrentChapterPages();
-        if (statusBar != null && pages != null && currentPageIndex < pages.size()) {
-            statusBar.setInfo(pages.get(currentPageIndex));
+        if (pages != null && currentPageIndex < pages.size()) {
+            setStatusInfo(pages.get(currentPageIndex));
+        }
+        StatusBar statusBar = getStatusBar();
+        if (statusBar != null) {
+            statusBar.updateWidget(BossKeyFactory.WIDGET_ID);
+        }
+    }
+
+    /**
+     * 显示当前页（受老板键隐藏状态影响）
+     */
+    private void setStatusInfo(String text) {
+        StatusBar statusBar = getStatusBar();
+        if (statusBar != null) {
+            statusBar.setInfo(bossHidden ? "" : text);
+        }
+    }
+
+    public void displayNovel() {
+        List<String> pages = getCurrentChapterPages();
+        if (pages != null && currentPageIndex < pages.size()) {
+            setStatusInfo(pages.get(currentPageIndex));
         }
     }
 
     public void nextPage() {
-        StatusBar statusBar = getStatusBar();
         List<String> pages = getCurrentChapterPages();
         if (pages == null) {
             JOptionPane.showMessageDialog(null, "小说为空，请先去选择小说");
@@ -74,17 +107,15 @@ public final class NovelService implements PersistentStateComponent<NovelService
         
         if (currentPageIndex + 1 < pages.size()) {
             currentPageIndex++;
-            if (statusBar != null) {
-                statusBar.setInfo(pages.get(currentPageIndex));
-            }
+            setStatusInfo(pages.get(currentPageIndex));
         } else {
             // 跳到下一章第一页
             if (currentChapterIndex + 1 < chapterInfos.size()) {
                 currentPageIndex = 0;
                 currentChapterIndex++;
                 pages = getCurrentChapterPages();
-                if (statusBar != null && pages != null && !pages.isEmpty()) {
-                    statusBar.setInfo(pages.get(currentPageIndex));
+                if (pages != null && !pages.isEmpty()) {
+                    setStatusInfo(pages.get(currentPageIndex));
                 }
             }
         }
@@ -94,7 +125,6 @@ public final class NovelService implements PersistentStateComponent<NovelService
     }
 
     public void prePage() {
-        StatusBar statusBar = getStatusBar();
         List<String> pages = getCurrentChapterPages();
         if (pages == null) {
             JOptionPane.showMessageDialog(null, "小说为空，请先去选择小说");
@@ -103,9 +133,7 @@ public final class NovelService implements PersistentStateComponent<NovelService
         }
         if (currentPageIndex > 0) {
             currentPageIndex--;
-            if (statusBar != null) {
-                statusBar.setInfo(pages.get(currentPageIndex));
-            }
+            setStatusInfo(pages.get(currentPageIndex));
         } else if (currentChapterIndex - 1 >= 0) {
             // 跳到上一章的最后一页
             currentChapterIndex--;
@@ -115,9 +143,7 @@ public final class NovelService implements PersistentStateComponent<NovelService
             }
             int size = pages.size();
             currentPageIndex = size - 1;
-            if (statusBar != null) {
-                statusBar.setInfo(pages.get(currentPageIndex));
-            }
+            setStatusInfo(pages.get(currentPageIndex));
         }
         
         // 自动保存进度
