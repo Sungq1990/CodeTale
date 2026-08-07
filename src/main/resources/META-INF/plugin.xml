@@ -56,8 +56,23 @@
         <statusBarWidgetFactory id="novel.status.preWidget" order="before novel.status.nextWidget" implementation="com.zjj.fishPlugin.factory.PrePageFactory"/>
         <statusBarWidgetFactory id="novel.status.nextWidget" order="before novel.status.autoPageWidget" implementation="com.zjj.fishPlugin.factory.NextPageFactory"/>
         <statusBarWidgetFactory id="novel.status.autoPageWidget" order="before Encoding" implementation="com.zjj.fishPlugin.factory.AutoPageFactory"/>
-        
+
         <postStartupActivity implementation="com.zjj.fishPlugin.listener.ProjectStartupListener"/>
     </extensions>
+
+    <actions>
+        <action id="YsQyBook.PrevPage"
+                class="com.zjj.fishPlugin.action.PrevPageAction"
+                text="YsQyBook: 上一页"
+                description="易阅读 - 上一页">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt PAGE_UP"/>
+        </action>
+        <action id="YsQyBook.NextPage"
+                class="com.zjj.fishPlugin.action.NextPageAction"
+                text="YsQyBook: 下一页"
+                description="易阅读 - 下一页">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt PAGE_DOWN"/>
+        </action>
+    </actions>
 
 </idea-plugin>

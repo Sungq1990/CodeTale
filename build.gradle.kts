@@ -14,6 +14,17 @@ repositories {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            setSrcDirs(listOf("src/main/Java"))
+        }
+        resources {
+            setSrcDirs(listOf("src/main/resources"))
+        }
+    }
+}
+
 dependencies {
     implementation("com.googlecode.juniversalchardet:juniversalchardet:1.0.3")
     implementation("cn.hutool:hutool-all:5.8.40")

@@ -82,6 +82,31 @@ public class ReadUI {
 
         List<String> subList = novelService.getChapters().subList(fromIndex, toIndex);
         bookList.setListData(subList.toArray(new String[0]));
+
+        if (autoPosition) {
+            selectCurrentChapter();
+        }
+    }
+
+    /**
+     * 自动选中并滚动到当前正在阅读的章节
+     */
+    public void selectCurrentChapter() {
+        if (novelService.getChapters() == null || novelService.getChapters().isEmpty()) {
+            return;
+        }
+        int currentChapterIndex = novelService.getCurrentChapterIndex();
+        int indexInPage = currentChapterIndex % CHAPTERS_PER_PAGE;
+        int totalChapters = novelService.getChapters().size();
+        int fromIndex = currentChapterPage * CHAPTERS_PER_PAGE;
+        int toIndex = Math.min(fromIndex + CHAPTERS_PER_PAGE, totalChapters);
+
+        if (currentChapterIndex >= fromIndex && currentChapterIndex < toIndex) {
+            bookList.setSelectedIndex(indexInPage);
+            bookList.ensureIndexIsVisible(indexInPage);
+        } else {
+            bookList.clearSelection();
+        }
     }
 
     /**

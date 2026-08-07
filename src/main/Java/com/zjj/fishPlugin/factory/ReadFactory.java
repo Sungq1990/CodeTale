@@ -18,6 +18,7 @@ public class ReadFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         NovelService novelService = NovelService.getInstance(project);
         ReadUI readUI = novelService.getReadUI();
+        readUI.loadChapterPage(true);
         Content content = ContentFactory.getInstance().createContent(readUI.getComponent(), "Book", false);
         toolWindow.getContentManager().addContent(content);
     }
