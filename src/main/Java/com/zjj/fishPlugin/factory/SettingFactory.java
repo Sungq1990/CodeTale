@@ -114,6 +114,7 @@ public class SettingFactory implements SearchableConfigurable {
             novelService.setNovelPath(url);
             this.loadNovelWithPagination(novelService, url);
         }
+        novelService.persistToGlobal();
         ReadUI readUI = novelService.getReadUI();
         readUI.loadChapterPage();
     }

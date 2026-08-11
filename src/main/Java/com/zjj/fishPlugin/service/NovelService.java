@@ -1,17 +1,12 @@
 package com.zjj.fishPlugin.service;
 
-import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.zjj.fishPlugin.factory.AutoPageFactory;
 import com.zjj.fishPlugin.factory.BossKeyFactory;
 import com.zjj.fishPlugin.ui.ReadUI;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -24,13 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 每个项目独立的小说服务
+ * 每个项目独立的小说服务，进度由全局 NovelGlobalConfig 持久化（所有项目共享）
  * Created by zhongjiajie on 2025/1/27
  */
 @Service
-@State(name = "NovelService", storages = @Storage("novel-service.xml"))
-public final class NovelService implements PersistentStateComponent<NovelService.NovelState> {
-    
+public final class NovelService {
+
     private final Project project;
     private ReadUI readUI;
     private List<String> chapters;               // 所有章节标题
@@ -48,6 +42,16 @@ public final class NovelService implements PersistentStateComponent<NovelService
 
     public NovelService(Project project) {
         this.project = project;
+        // 从全局配置恢复状态（跨项目共享）
+        NovelGlobalConfig.State global = NovelGlobalConfig.getInstance().getState();
+        if (global != null) {
+            this.novelPath = global.novelPath;
+            this.lineNumber = global.lineNumber;
+            this.autoPageTime = global.autoPageTime;
+            this.currentChapterIndex = global.currentChapterIndex;
+            this.currentPageIndex = global.currentPageIndex;
+            clearCurrentChapterCache();
+        }
     }
 
     public static NovelService getInstance(Project project) {
@@ -242,38 +246,17 @@ public final class NovelService implements PersistentStateComponent<NovelService
         return project;
     }
 
-    // 持久化状态类
-    public static class NovelState {
-        public String novelPath = "";
-        public String lineNumber = "60 字";
-        public String autoPageTime = "5000";
-        public int currentChapterIndex = 0;
-        public int currentPageIndex = 0;
-    }
-
-    private NovelState state = new NovelState();
-
-    @Override
-    public @Nullable NovelState getState() {
-        // 将当前状态保存到state对象
-        state.novelPath = novelPath;
-        state.lineNumber = lineNumber;
-        state.autoPageTime = autoPageTime;
-        state.currentChapterIndex = currentChapterIndex;
-        state.currentPageIndex = currentPageIndex;
-        return state;
-    }
-
-    @Override
-    public void loadState(@NotNull NovelState state) {
-        // 从state对象恢复状态
-        XmlSerializerUtil.copyBean(state, this.state);
-        this.novelPath = state.novelPath;
-        this.lineNumber = state.lineNumber;
-        this.autoPageTime = state.autoPageTime;
-        this.currentChapterIndex = state.currentChapterIndex;
-        this.currentPageIndex = state.currentPageIndex;
-        clearCurrentChapterCache();
+    // 将当前状态持久化到全局配置
+    public void persistToGlobal() {
+        NovelGlobalConfig.State global = NovelGlobalConfig.getInstance().getState();
+        if (global == null) {
+            return;
+        }
+        global.novelPath = novelPath;
+        global.lineNumber = lineNumber;
+        global.autoPageTime = autoPageTime;
+        global.currentChapterIndex = currentChapterIndex;
+        global.currentPageIndex = currentPageIndex;
     }
 
     // 自动加载上次的小说
@@ -404,9 +387,7 @@ public final class NovelService implements PersistentStateComponent<NovelService
 
     // 保存阅读进度
     private void saveProgress() {
-        // IntelliJ IDEA会自动调用getState()方法来保存状态
-        // 这里我们只需要确保状态是最新的即可
-        // 状态会在适当的时机自动保存
+        persistToGlobal();
     }
 
     public static class ChapterInfo {
