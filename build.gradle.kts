@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.intellij.platform") version "2.5.0"
 }
 
-group = "com.wtx"
+group = "com.sgq"
 version = "1.2.0"
 
 repositories {

@@ -1,12 +1,12 @@
-package com.zjj.fishPlugin.action;
+package com.sgq.fishPlugin.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.zjj.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService;
 import org.jetbrains.annotations.NotNull;
 
-public class BossKeyAction extends AnAction {
+public class NextPageAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -15,7 +15,7 @@ public class BossKeyAction extends AnAction {
             return;
         }
         NovelService novelService = NovelService.getInstance(project);
-        novelService.toggleBossHide();
+        novelService.nextPage();
     }
 
     @Override

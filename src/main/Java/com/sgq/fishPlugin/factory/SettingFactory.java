@@ -1,14 +1,14 @@
-package com.zjj.fishPlugin.factory;
+package com.sgq.fishPlugin.factory;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.NlsContexts;
-import com.zjj.fishPlugin.service.NovelService;
-import com.zjj.fishPlugin.service.NovelService.ChapterInfo;
-import com.zjj.fishPlugin.ui.ReadUI;
-import com.zjj.fishPlugin.ui.SettingUI;
+import com.sgq.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService.ChapterInfo;
+import com.sgq.fishPlugin.ui.ReadUI;
+import com.sgq.fishPlugin.ui.SettingUI;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by zhongjiajie on 2025/10/9 10:20.
+ * Created by sgq on 2025/10/9 10:20.
  */
 public class SettingFactory implements SearchableConfigurable {
     private SettingUI settingUI;

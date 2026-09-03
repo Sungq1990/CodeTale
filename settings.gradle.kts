@@ -1,1 +1,1 @@
-rootProject.name = "YsQy-Book"
+rootProject.name = "CodeTale"

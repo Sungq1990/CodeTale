@@ -1,6 +1,6 @@
-package com.zjj.fishPlugin.ui;
+package com.sgq.fishPlugin.ui;
 
-import com.zjj.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
- * Created by zhongjiajie on 2025/10/9 10:11.
+ * Created by sgq on 2025/10/9 10:11.
  */
 public class ReadUI {
     private JPanel mainPanel;

@@ -1,4 +1,4 @@
-package com.zjj.fishPlugin.service;
+package com.sgq.fishPlugin.service;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;

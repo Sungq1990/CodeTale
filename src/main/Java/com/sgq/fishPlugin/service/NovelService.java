@@ -1,12 +1,12 @@
-package com.zjj.fishPlugin.service;
+package com.sgq.fishPlugin.service;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.zjj.fishPlugin.factory.AutoPageFactory;
-import com.zjj.fishPlugin.factory.BossKeyFactory;
-import com.zjj.fishPlugin.ui.ReadUI;
+import com.sgq.fishPlugin.factory.AutoPageFactory;
+import com.sgq.fishPlugin.factory.BossKeyFactory;
+import com.sgq.fishPlugin.ui.ReadUI;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * 每个项目独立的小说服务，进度由全局 NovelGlobalConfig 持久化（所有项目共享）
- * Created by zhongjiajie on 2025/1/27
+ * Created by sgq on 2025/1/27
  */
 @Service
 public final class NovelService {
@@ -244,6 +244,45 @@ public final class NovelService {
 
     public Project getProject() {
         return project;
+    }
+
+    /**
+     * 获取当前阅读进度百分比 0~100
+     */
+    public int getProgressPercent() {
+        if (chapterInfos == null || chapterInfos.isEmpty()) {
+            return 0;
+        }
+        int totalChapters = chapterInfos.size();
+        if (totalChapters == 0) return 0;
+        List<String> pages = getCurrentChapterPages();
+        int pagesInCurrent = (pages != null && !pages.isEmpty()) ? pages.size() : 1;
+        int safePage = Math.max(0, Math.min(currentPageIndex, pagesInCurrent - 1));
+        double fractionInChapter = (double) (safePage + 1) / pagesInCurrent;
+        double overall = (currentChapterIndex + fractionInChapter) / totalChapters;
+        overall = Math.min(1.0, Math.max(0.0, overall));
+        return (int) Math.round(overall * 100);
+    }
+
+    /**
+     * 获取进度显示文本，如 "当前阅读进度:51%"
+     */
+    public String getProgressText() {
+        if (chapterInfos == null || chapterInfos.isEmpty() || novelPath == null || novelPath.isEmpty()) {
+            return "当前阅读进度: --";
+        }
+        int percent = getProgressPercent();
+        return "当前阅读进度:" + percent + "%";
+    }
+
+    /**
+     * 获取鼠标悬停在 » 上的提示文案，如 "更多阅读选项(阅读进度:51%)"
+     */
+    public String getTooltipProgressText() {
+        if (chapterInfos == null || chapterInfos.isEmpty() || novelPath == null || novelPath.isEmpty()) {
+            return "更多阅读选项(阅读进度: --)";
+        }
+        return "更多阅读选项(阅读进度:" + getProgressPercent() + "%)";
     }
 
     // 将当前状态持久化到全局配置

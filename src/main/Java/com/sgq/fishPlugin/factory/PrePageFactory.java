@@ -1,4 +1,4 @@
-package com.zjj.fishPlugin.factory;
+package com.sgq.fishPlugin.factory;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
@@ -6,7 +6,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 import com.intellij.util.Consumer;
-import com.zjj.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;

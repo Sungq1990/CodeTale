@@ -1,4 +1,4 @@
-package com.zjj.fishPlugin.factory;
+package com.sgq.fishPlugin.factory;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -8,7 +8,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 import com.intellij.util.Consumer;
-import com.zjj.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -97,7 +97,7 @@ public class NovelMenuFactory implements StatusBarWidgetFactory {
 
         @Override
         public @Nullable @Nls String getTooltipText() {
-            return "翻页操作（点击展开菜单）";
+            return NovelService.getInstance(project).getTooltipProgressText();
         }
 
         @Override
@@ -107,7 +107,10 @@ public class NovelMenuFactory implements StatusBarWidgetFactory {
 
         private void showMenu(Component invoker) {
             boolean autoOn = isAutoPage();
+            NovelService novelService = NovelService.getInstance(project);
+            String progressText = novelService.getProgressText();
             String[] actions = {
+                    progressText,
                     "上一页",
                     "下一页",
                     autoOn ? "关闭自动翻页" : "开启自动翻页"
@@ -115,7 +118,7 @@ public class NovelMenuFactory implements StatusBarWidgetFactory {
 
             JBPopup popup = JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(Arrays.asList(actions))
-                    .setTitle("翻页")
+                    .setTitle("更多选项")
                     .setRequestFocus(true)
                     .setItemChosenCallback(this::performAction)
                     .createPopup();
@@ -123,6 +126,9 @@ public class NovelMenuFactory implements StatusBarWidgetFactory {
         }
 
         private void performAction(@NotNull String action) {
+            if (action.startsWith("当前阅读进度")) {
+                return;
+            }
             NovelService novelService = NovelService.getInstance(project);
             switch (action) {
                 case "上一页":

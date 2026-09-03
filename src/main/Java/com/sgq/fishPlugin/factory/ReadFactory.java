@@ -1,4 +1,4 @@
-package com.zjj.fishPlugin.factory;
+package com.sgq.fishPlugin.factory;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -6,12 +6,12 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.zjj.fishPlugin.service.NovelService;
-import com.zjj.fishPlugin.ui.ReadUI;
+import com.sgq.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.ui.ReadUI;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by zhongjiajie on 2025/9/30 16:24.
+ * Created by sgq on 2025/9/30 16:24.
  */
 public class ReadFactory implements ToolWindowFactory {
 

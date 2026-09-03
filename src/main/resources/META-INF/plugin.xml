@@ -1,23 +1,23 @@
 <idea-plugin>
-    <id>com.zjj.fishPlugin</id>
-    <name>YsQy-Book</name>
-    <version>1.1.1</version>
-    <vendor email="youshangzhuqingyuzhong@gmail.com">YsQy</vendor>
+    <id>com.sgq.fishPlugin</id>
+    <name>CodeTale</name>
+    <version>1.2.0</version>
+    <vendor email="459905999@qq.com">Sgq</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <![CDATA[
-    <b>YsQy-Book</b> — A lightweight novel reading plugin for IntelliJ IDEA.<br>
+    <b>CodeTale</b> — A lightweight novel reading plugin for IntelliJ IDEA.<br>
     Supports chapter-based reading, page jumping, <b>auto page turning</b>, and <b>reading progress persistence</b>.<br>
     Enjoy your favorite books directly within your IDE with seamless reading experience.<br><br>
     ]]>
     <description>
         <![CDATA[
-    <b>YsQy-Book</b> — A lightweight novel reading plugin for IntelliJ IDEA.<br>
+    <b>CodeTale</b> — A lightweight novel reading plugin for IntelliJ IDEA.<br>
     Supports chapter-based reading, page jumping, <b>auto page turning</b>, and <b>reading progress persistence</b>.<br>
     Enjoy your favorite books directly within your IDE with seamless reading experience.<br><br>
 
-    <b>🆕 Version 1.1.1 - Major Update:</b><br>
+    <b>🆕 Version 1.2.0 - Major Update:</b><br>
     ✨ <b>Reading Progress Persistence</b>: Automatically saves and restores your reading progress<br>
     🔄 <b>Multi-Project Support</b>: Each project maintains independent reading state<br>
     🚀 <b>Auto-Load on Startup</b>: Automatically loads your last novel when opening IDEA<br>
@@ -25,24 +25,24 @@
     ⚡ <b>Real-time Progress Saving</b>: Progress is saved automatically with every page turn<br><br>
 
     Usage:<br>
-    1. <b>IDEA Settings > Tools > YsQy Book</b>: Set the novel path and auto page turn interval.<br>
+    1. <b>IDEA Settings > Tools > CodeTale</b>: Set the novel path and auto page turn interval.<br>
     2. <b>Bottom-left corner of IDEA</b>: Read novels directly in the status bar.<br>
-    3. <b>YsQy-Book sidebar</b>: Navigate chapters and menus.<br>
+    3. <b>CodeTale sidebar</b>: Navigate chapters and menus.<br>
     4. <b>Seamless Experience</b>: Your reading progress is automatically saved and restored!<br><br>
 
-    <b>YsQy-Book</b> — 一款轻量级 IntelliJ IDEA 小说阅读插件，支持章节阅读、页码跳转、自动翻页与阅读进度持久化功能，让你在编码间隙轻松阅读。<br><br>
-    
-    <b>🆕 版本 1.1.1 - 重大更新：</b><br>
+    <b>CodeTale</b> — 一款轻量级 IntelliJ IDEA 小说阅读插件，支持章节阅读、页码跳转、自动翻页与阅读进度持久化功能，让你在编码间隙轻松阅读。<br><br>
+
+    <b>🆕 版本 1.2.0 - 重大更新：</b><br>
     ✨ <b>阅读进度持久化</b>：自动保存和恢复阅读进度<br>
     🔄 <b>多项目支持</b>：每个项目独立维护阅读状态<br>
     🚀 <b>启动自动加载</b>：打开IDEA时自动加载上次的小说<br>
     📖 <b>智能章节导航</b>：章节列表自动定位到当前阅读位置<br>
     ⚡ <b>实时进度保存</b>：每次翻页自动保存进度<br><br>
-    
+
     使用说明：<br>
-    1. <b>IDEA 设置 > 工具 > YsQy Book</b>：设置小说路径和自动翻页秒数。<br>
+    1. <b>IDEA 设置 > 工具 > CodeTale</b>：设置小说路径和自动翻页秒数。<br>
     2. <b>IDEA 左下角</b>：直接在状态栏阅读小说。<br>
-    3. <b>YsQy-Book 侧边栏</b>：浏览章节和菜单。<br>
+    3. <b>CodeTale 侧边栏</b>：浏览章节和菜单。<br>
     4. <b>无缝体验</b>：阅读进度自动保存和恢复！
     ]]>
     </description>
@@ -50,31 +50,31 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable groupId="tools" key="plugin.settings.displayName" bundle="messages.Bundle" id="ysqy.id" instance="com.zjj.fishPlugin.factory.SettingFactory"/>
+        <projectConfigurable groupId="tools" key="plugin.settings.displayName" bundle="messages.Bundle" id="codetale.id" instance="com.sgq.fishPlugin.factory.SettingFactory"/>
 
-        <toolWindow id="YsQy-Book" secondary="false" anchor="right" icon="/icon/book.png" factoryClass="com.zjj.fishPlugin.factory.ReadFactory"/>
-        <statusBarWidgetFactory id="novel.status.menuWidget" implementation="com.zjj.fishPlugin.factory.NovelMenuFactory"/>
-        <statusBarWidgetFactory id="novel.status.bossKeyWidget" order="after novel.status.menuWidget" implementation="com.zjj.fishPlugin.factory.BossKeyFactory"/>
+        <toolWindow id="CodeTale" secondary="false" anchor="right" icon="/icon/book.png" factoryClass="com.sgq.fishPlugin.factory.ReadFactory"/>
+        <statusBarWidgetFactory id="novel.status.menuWidget" implementation="com.sgq.fishPlugin.factory.NovelMenuFactory"/>
+        <statusBarWidgetFactory id="novel.status.bossKeyWidget" order="after novel.status.menuWidget" implementation="com.sgq.fishPlugin.factory.BossKeyFactory"/>
 
-        <postStartupActivity implementation="com.zjj.fishPlugin.listener.ProjectStartupListener"/>
+        <postStartupActivity implementation="com.sgq.fishPlugin.listener.ProjectStartupListener"/>
     </extensions>
 
     <actions>
-        <action id="YsQyBook.PrevPage"
-                class="com.zjj.fishPlugin.action.PrevPageAction"
-                text="YsQyBook: 上一页"
+        <action id="CodeTale.PrevPage"
+                class="com.sgq.fishPlugin.action.PrevPageAction"
+                text="CodeTale: 上一页"
                 description="易阅读 - 上一页">
             <keyboard-shortcut keymap="$default" first-keystroke="alt PAGE_UP"/>
         </action>
-        <action id="YsQyBook.NextPage"
-                class="com.zjj.fishPlugin.action.NextPageAction"
-                text="YsQyBook: 下一页"
+        <action id="CodeTale.NextPage"
+                class="com.sgq.fishPlugin.action.NextPageAction"
+                text="CodeTale: 下一页"
                 description="易阅读 - 下一页">
             <keyboard-shortcut keymap="$default" first-keystroke="alt PAGE_DOWN"/>
         </action>
-        <action id="YsQyBook.BossKey"
-                class="com.zjj.fishPlugin.action.BossKeyAction"
-                text="YsQyBook: 老板键（隐藏/显示小说）"
+        <action id="CodeTale.BossKey"
+                class="com.sgq.fishPlugin.action.BossKeyAction"
+                text="CodeTale: 老板键（隐藏/显示小说）"
                 description="易阅读 - 隐藏/显示当前小说文本">
             <keyboard-shortcut keymap="$default" first-keystroke="alt B"/>
         </action>

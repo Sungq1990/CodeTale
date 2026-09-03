@@ -1,7 +1,7 @@
-package com.zjj.fishPlugin.ui;
+package com.sgq.fishPlugin.ui;
 
 import com.intellij.openapi.ui.ComboBox;
-import com.zjj.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.io.File;
 
 /**
- * Created by zhongjiajie on 2025/9/30 16:31.
+ * Created by sgq on 2025/9/30 16:31.
  */
 public class SettingUI {
     private final String[] items = {"50 字", "60 字", "70 字", "80 字"};

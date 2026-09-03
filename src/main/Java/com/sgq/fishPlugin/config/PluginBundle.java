@@ -1,4 +1,4 @@
-package com.zjj.fishPlugin.config;
+package com.sgq.fishPlugin.config;
 
 import com.intellij.AbstractBundle;
 import org.jetbrains.annotations.NonNls;

@@ -1,4 +1,4 @@
-package com.zjj.fishPlugin.factory;
+package com.sgq.fishPlugin.factory;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
@@ -6,7 +6,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 import com.intellij.util.Consumer;
-import com.zjj.fishPlugin.service.NovelService;
+import com.sgq.fishPlugin.service.NovelService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -15,21 +15,27 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 
-public class NextPageFactory implements StatusBarWidgetFactory {
+/**
+ * 老板键状态栏按钮
+ * 点击可在 隐藏/显示 小说文本之间切换
+ */
+public class BossKeyFactory implements StatusBarWidgetFactory {
+
+    public static final String WIDGET_ID = "novel.status.bossKeyWidget";
 
     @Override
     public @NotNull @NonNls String getId() {
-        return "novel.status.nextWidget";
+        return WIDGET_ID;
     }
 
     @Override
     public @NotNull @NlsContexts.ConfigurableName String getDisplayName() {
-        return "Next";
+        return "Boss Key";
     }
 
     @Override
     public boolean isAvailable(@NotNull Project project) {
-        return true; // 控制是否显示
+        return true;
     }
 
     @Override
@@ -60,7 +66,7 @@ public class NextPageFactory implements StatusBarWidgetFactory {
 
         @Override
         public @NotNull String ID() {
-            return "novel.status.nextWidget";
+            return WIDGET_ID;
         }
 
         @Override
@@ -78,22 +84,31 @@ public class NextPageFactory implements StatusBarWidgetFactory {
 
         @Override
         public @Nullable Icon getIcon() {
-            return UIManager.getIcon("FileView.directoryIcon");
+            NovelService novelService = NovelService.getInstance(project);
+            return novelService.isBossHidden()
+                    ? UIManager.getIcon("FileChooser.upFolderIcon")
+                    : UIManager.getIcon("FileView.directoryIcon");
         }
 
         @Override
         public @Nullable @Nls String getTooltipText() {
-            return "点击显示下一行";
+            NovelService novelService = NovelService.getInstance(project);
+            return novelService.isBossHidden()
+                    ? "BossKey：文本已隐藏"
+                    : "BossKey：文本已显示";
         }
 
         @Override
         public @Nullable Consumer<MouseEvent> getClickConsumer() {
-            return e -> showNextLine();
+            return e -> toggleBoss();
         }
 
-        private void showNextLine() {
+        private void toggleBoss() {
             NovelService novelService = NovelService.getInstance(project);
-            novelService.nextPage();
+            novelService.toggleBossHide();
+            if (statusBar != null) {
+                statusBar.updateWidget(ID());
+            }
         }
     }
 }
