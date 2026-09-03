@@ -19,7 +19,7 @@ public class ReadUI {
     private JButton nextButton;
 
     private int currentChapterPage = 0; // 当前章节页码
-    private static final int CHAPTERS_PER_PAGE = 30; // 每页显示多少个章节
+    private static final int CHAPTERS_PER_PAGE = 25; // 每页显示多少个章节
     private final NovelService novelService;
 
     public ReadUI(NovelService novelService) {
