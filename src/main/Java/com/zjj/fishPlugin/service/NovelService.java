@@ -38,7 +38,7 @@ public final class NovelService {
     private String charset;                      // 小说文件编码
     private String autoPageTime;                 // 自动翻页时间
 
-    private boolean bossHidden = false;
+    private boolean bossHidden = true;
 
     public NovelService(Project project) {
         this.project = project;
